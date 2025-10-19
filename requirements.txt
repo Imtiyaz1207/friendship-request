@@ -1,2 +1,4 @@
-Flask==3.0.3
-gunicorn
+Flask==2.3.2
+requests==2.32.1
+python-dotenv==1.0.0
+gunicorn==21.2.0
