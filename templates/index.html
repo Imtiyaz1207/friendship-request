@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>💞 Friendship Proposal 💞</title>
+<style>
+body {
+  margin: 0;
+  height: 100vh;
+  font-family: "Poppins", sans-serif;
+  color: white;
+  text-align: center;
+  cursor: pointer;
+  background: radial-gradient(circle at top left, #ff9a9e, #fad0c4);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  overflow-x: hidden;
+}
+
+/* Fade animation */
+.fade {
+  opacity: 0;
+  transition: opacity 0.6s ease;
+}
+.fade.show {
+  opacity: 1;
+}
+
+/* Start Screen */
+#startScreen {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  z-index: 999;
+}
+#startScreen h1 {
+  font-size: 2em;
+  text-shadow: 0 0 15px #fff;
+  margin: 0 20px;
+}
+
+/* Containers */
+.container {
+  background: rgba(255,255,255,0.15);
+  padding: 25px;
+  border-radius: 20px;
+  box-shadow: 0 0 25px rgba(255,255,255,0.3);
+  display: none;
+  width: 90%;
+  max-width: 400px;
+  flex-direction: column;
+}
+.names {
+  font-size: 1.4em;
+  font-weight: bold;
+  color: #ffeef7;
+  text-shadow: 0 0 15px #ff8fb2;
+  margin-bottom: 15px;
+}
+h1 {
+  font-size: 2em;
+  margin-bottom: 10px;
+  text-shadow: 0 0 15px #fff, 0 0 30px #ff8fb2;
+  animation: glow 2s ease-in-out infinite alternate;
+}
+p {
+  font-size: 1.1em;
+  margin-bottom: 20px;
+  color: #fff;
+  text-shadow: 0 0 8px rgba(255,255,255,0.5);
+}
+button {
+  padding: 10px 20px;
+  margin: 8px;
+  border: none;
+  border-radius: 12px;
+  font-size: 0.95em;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 0 10px rgba(255,255,255,0.3);
+}
+.yes-btn { background-color: #00ffa3; color: #fff; font-weight:bold;}
+.yes-btn:hover { transform: scale(1.1); background-color: #00d98a; }
+.no-btn { background-color: #ff4f70; color:#fff; position: relative;}
+.no-btn:hover { transform: scale(1.05); background-color: #ff2e5f; }
+
+#step2Container button { padding: 8px 16px; font-size: 0.9em; }
+
+#response { font-size:1.2em; margin-top:15px; color:#fff8fb; text-shadow:0 0 15px #fff; opacity:0; transition: opacity 0.6s ease;}
+#response.show { opacity:1; }
+
+.heart { position:absolute; color:rgba(255, 255, 255, 0.7); font-size:20px; animation: floatUp 6s linear infinite; }
+
+#footer {
+  position: fixed;
+  bottom: 10px;
+  width: 100%;
+  text-align: center;
+  font-size: 0.9em;
+  color: rgba(255, 255, 255, 0.8);
+  text-shadow: 0 0 5px #fff;
+  pointer-events: none;
+  opacity: 0; /* hidden initially */
+  transition: opacity 0.8s ease;
+}
+#footer.show {
+  opacity: 1; /* fade in */
+}
+
+@keyframes floatUp { from{transform: translateY(100vh) scale(0.5);opacity:1;} to{transform:translateY(-10vh) scale(1.5);opacity:0;} }
+@keyframes glow { from{text-shadow:0 0 5px #fff,0 0 15px #ff8fb2;} to{text-shadow:0 0 15px #fff,0 0 30px #ff6fa9;} }
+
+/* Mobile adjustments */
+@media (max-width: 480px) {
+  .container { padding: 20px; }
+  h1 { font-size: 1.8em; }
+  p { font-size: 1em; }
+  button { padding: 8px 16px; font-size: 0.85em; }
+  #startScreen h1 { font-size: 1.8em; }
+  #footer { font-size: 0.75em; }
+}
+</style>
+</head>
+<body>
+
+<div id="startScreen">
+  <h1>💖 Tap Anywhere to Start 💖</h1>
+</div>
+
+<!-- Step 1 -->
+<div class="container fade" id="step1Container">
+  <div class="names">💖 From <span id="fromName">Shaik Imtiyaz</span>💖</div>
+  <h1>Is this 5c1? 🌸</h1>
+  <button class="yes-btn" onclick="step2Show()">Yes 😊</button>
+  <button class="no-btn" id="noBtnStep1" onmouseover="moveButton(this)">No 🙈</button>
+</div>
+
+<!-- Step 2 -->
+<div class="container fade" id="step2Container">
+  <div class="names">💖 From <span id="fromName2">Shaik Imtiyaz</span> to <span id="toName">5c1🦋</span>💖</div>
+  <h1>Will You Be My Friend?</h1>
+  <p>Because life is better with a friend like you 🌸</p>
+  <button class="yes-btn" onclick="sayYes()">Yes 😊</button>
+  <button class="no-btn" id="noBtn" onmouseover="moveButton(this)">No 🙈</button>
+  <div id="response"></div>
+</div>
+
+<!-- Footer -->
+<div id="footer">Built with ❤️ by SHAIK IMTIYAZ</div>
+
+<audio id="bgMusic" loop>
+  <source src="https://raw.githubusercontent.com/Imtiyaz1207/friend5c1/main/zara%20sa.mp3" type="audio/mpeg">
+</audio>
+
+<script>
+const fromName = "Shaik Imtiyaz";
+const toName = "5c1🦋";
+
+document.getElementById("fromName").textContent = fromName;
+document.getElementById("fromName2").textContent = fromName;
+document.getElementById("toName").textContent = toName;
+
+const music = document.getElementById("bgMusic");
+const startScreen = document.getElementById("startScreen");
+const step1 = document.getElementById("step1Container");
+const step2 = document.getElementById("step2Container");
+const response = document.getElementById("response");
+const footer = document.getElementById("footer");
+
+// Floating hearts
+function createHearts(){
+    const heart = document.createElement("div");
+    heart.classList.add("heart");
+    heart.textContent="💖";
+    heart.style.left = Math.random()*100 + "vw";
+    heart.style.fontSize = Math.random()*20 +15 + "px";
+    document.body.appendChild(heart);
+    setTimeout(()=>heart.remove(),6000);
+}
+setInterval(createHearts,400);
+
+// Log tap
+function logTap(action){
+    fetch('/log',{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({action: action})
+    });
+}
+
+// Page load log
+window.addEventListener('load', () => logTap('page_load'));
+
+// Start experience → Step 1
+function startExperience(){
+    startScreen.style.display="none";
+    step1.style.display="flex";
+    setTimeout(()=>step1.classList.add('show'), 50); // fade in
+    music.play().catch(()=>{});
+    logTap('tap');
+    document.body.removeEventListener('click', startExperience);
+}
+document.body.addEventListener('click', startExperience);
+
+// Step1 → Step2
+function step2Show(){
+    logTap('step1_yes');
+    step1.classList.remove('show');
+    setTimeout(()=>{
+        step1.style.display="none";
+        step2.style.display="flex";
+        setTimeout(()=>{
+            step2.classList.add('show'); // fade in step2
+            footer.classList.add('show'); // show footer
+        }, 50);
+    }, 600);
+}
+
+// No button runaway
+function moveButton(btn){
+    logTap('no');
+    btn.style.position="absolute";
+    btn.style.top = Math.random()*80 + "%";
+    btn.style.left = Math.random()*80 + "%";
+}
+
+// Say Yes → just show response
+function sayYes(){
+    logTap('yes');
+    response.style.display = 'block';
+    response.classList.add('show');
+    response.innerHTML = `Yay! 🎉 ${toName}, you just made ${fromName}'s heart smile 💕`;
+}
+</script>
+</body>
