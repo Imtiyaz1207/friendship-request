@@ -5,14 +5,14 @@ import requests
 from dotenv import load_dotenv
 import csv
 
-app = Flask(_name_)
+app = Flask(__name__)  # ✅ double underscores on both sides
 
 # Load environment variables (Google Script URL)
 load_dotenv()
 GOOGLE_SCRIPT_URL = os.getenv("GOOGLE_SCRIPT_URL")
 
 # Absolute path for CSV log
-LOG_FILE = os.path.join(os.path.dirname(_file_), "logs.csv")
+LOG_FILE = os.path.join(os.path.dirname(__file__), "logs.csv")  # ✅ double underscores
 
 # Create CSV file if not exists
 if not os.path.exists(LOG_FILE):
@@ -61,5 +61,5 @@ def log_action():
     log_event(event, ip)
     return jsonify({"status": "ok"})
 
-if _name_ == "_main_":
+if __name__ == "__main__":  # ✅ double underscores here too
     app.run(debug=True)
