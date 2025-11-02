@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>💞 Friendship Proposal 💞</title>
+<title>💞 Friendship Request 💞</title>
 <style>
 body {
   margin: 0;
@@ -20,33 +20,9 @@ body {
   overflow-x: hidden;
 }
 
-/* Fade animation */
-.fade {
-  opacity: 0;
-  transition: opacity 0.6s ease;
-}
-.fade.show {
-  opacity: 1;
-}
-
-/* Start Screen */
-#startScreen {
-  position: fixed;
-  width: 100%;
-  height: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
-  z-index: 999;
-}
-#startScreen h1 {
-  font-size: 2em;
-  text-shadow: 0 0 15px #fff;
-  margin: 0 20px;
-}
-
-/* Containers */
+/* Transition & glow */
+.fade { opacity: 0; transition: opacity 0.6s ease; }
+.fade.show { opacity: 1; }
 .container {
   background: rgba(255,255,255,0.15);
   padding: 25px;
@@ -57,186 +33,221 @@ body {
   max-width: 400px;
   flex-direction: column;
 }
-.names {
-  font-size: 1.4em;
-  font-weight: bold;
-  color: #ffeef7;
-  text-shadow: 0 0 15px #ff8fb2;
-  margin-bottom: 15px;
-}
-h1 {
-  font-size: 2em;
-  margin-bottom: 10px;
-  text-shadow: 0 0 15px #fff, 0 0 30px #ff8fb2;
-  animation: glow 2s ease-in-out infinite alternate;
-}
-p {
-  font-size: 1.1em;
-  margin-bottom: 20px;
-  color: #fff;
-  text-shadow: 0 0 8px rgba(255,255,255,0.5);
-}
-button {
-  padding: 10px 20px;
-  margin: 8px;
-  border: none;
-  border-radius: 12px;
-  font-size: 0.95em;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 0 10px rgba(255,255,255,0.3);
-}
-.yes-btn { background-color: #00ffa3; color: #fff; font-weight:bold;}
-.yes-btn:hover { transform: scale(1.1); background-color: #00d98a; }
-.no-btn { background-color: #ff4f70; color:#fff; position: relative;}
-.no-btn:hover { transform: scale(1.05); background-color: #ff2e5f; }
-
-#step2Container button { padding: 8px 16px; font-size: 0.9em; }
-
-#response { font-size:1.2em; margin-top:15px; color:#fff8fb; text-shadow:0 0 15px #fff; opacity:0; transition: opacity 0.6s ease;}
-#response.show { opacity:1; }
-
+.names { font-size: 1.4em; font-weight: bold; color: #ffeef7; text-shadow:0 0 15px #ff8fb2; margin-bottom:15px; }
+h1 { font-size: 2em; margin-bottom:10px; text-shadow:0 0 15px #fff,0 0 30px #ff8fb2; animation: glow 2s ease-in-out infinite alternate; }
+p { font-size:1.1em; margin-bottom:20px; color:#fff; text-shadow:0 0 8px rgba(255,255,255,0.5); }
+button { padding:10px 20px; margin:8px; border:none; border-radius:12px; font-size:0.95em; cursor:pointer; transition: all 0.3s ease; box-shadow:0 0 10px rgba(255,255,255,0.3);}
+.yes-btn { background-color:#00ffa3;color:#fff;font-weight:bold;}
+.yes-btn:hover { transform:scale(1.1); background-color:#00d98a;}
+.no-btn { background-color:#ff4f70;color:#fff; position: relative;}
+.no-btn:hover { transform:scale(1.05); background-color:#ff2e5f;}
+#footer { position: fixed; bottom:10px; width:100%; text-align:center; font-size:0.9em; color:rgba(255,255,255,0.8); text-shadow:0 0 5px #fff; pointer-events:none; opacity:0; transition: opacity 0.8s ease; }
+#footer.show { opacity:1; }
 .heart { position:absolute; color:rgba(255, 255, 255, 0.7); font-size:20px; animation: floatUp 6s linear infinite; }
+@keyframes floatUp { from{transform:translateY(100vh) scale(0.5);opacity:1;} to{transform:translateY(-10vh) scale(1.5);opacity:0;} }
+@keyframes glow { from{text-shadow:0 0 5px #fff,0 0 15px #ff8fb2;} to{text-shadow:0 0 15px #fff,0 0 30px #ff6fa9;} }
+input { padding:8px; border-radius:8px; border:none; font-size:1em; margin-top:8px; }
+#passwordError { color:#ff4f70; display:none; margin-top:5px; }
 
-#footer {
+/* 🌸 New overlay password popup */
+#pagePasswordOverlay {
   position: fixed;
-  bottom: 10px;
-  width: 100%;
-  text-align: center;
-  font-size: 0.9em;
-  color: rgba(255, 255, 255, 0.8);
-  text-shadow: 0 0 5px #fff;
-  pointer-events: none;
-  opacity: 0; /* hidden initially */
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: radial-gradient(circle at top left, #ffb6c1, #ff9a9e);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  z-index: 9999;
+  opacity: 1;
   transition: opacity 0.8s ease;
 }
-#footer.show {
-  opacity: 1; /* fade in */
+#pagePasswordOverlay.fadeOut {
+  opacity: 0;
+  pointer-events: none;
 }
-
-@keyframes floatUp { from{transform: translateY(100vh) scale(0.5);opacity:1;} to{transform:translateY(-10vh) scale(1.5);opacity:0;} }
-@keyframes glow { from{text-shadow:0 0 5px #fff,0 0 15px #ff8fb2;} to{text-shadow:0 0 15px #fff,0 0 30px #ff6fa9;} }
-
-/* Mobile adjustments */
-@media (max-width: 480px) {
-  .container { padding: 20px; }
-  h1 { font-size: 1.8em; }
-  p { font-size: 1em; }
-  button { padding: 8px 16px; font-size: 0.85em; }
-  #startScreen h1 { font-size: 1.8em; }
-  #footer { font-size: 0.75em; }
+#pagePasswordOverlay input {
+  padding: 10px;
+  border-radius: 10px;
+  border: none;
+  font-size: 1em;
+  margin-top: 10px;
+  width: 200px;
+  text-align: center;
+}
+#pagePasswordOverlay button {
+  margin-top: 10px;
+  background: #00ffa3;
+  color: white;
+  border: none;
+  padding: 8px 15px;
+  border-radius: 10px;
+  cursor: pointer;
+}
+#pagePasswordError {
+  color: #ff4f70;
+  margin-top: 8px;
+  display: none;
 }
 </style>
 </head>
 <body>
 
-<div id="startScreen">
-  <h1>💖 Tap Anywhere to Start 💖</h1>
+<!-- 🔐 Page Password Overlay -->
+<div id="pagePasswordOverlay">
+  <h2 id="passwordHint">Hint: two words (enter your name 5c1) in lower case🦋</h2>
+  <input type="password" id="pagePasswordInput" placeholder="😊🦋">
+  <button onclick="verifyPagePassword()">Unlock 🔓</button>
+  <p id="pagePasswordError">Incorrect password! Try again.</p>
+</div>
+
+<!-- 🎵 Background music -->
+<audio id="bgMusic" src="https://github.com/Imtiyaz1207/friendship-request/raw/refs/heads/main/static/zara_sa.mp3" loop></audio>
+
+<div id="startScreen" style="display:none;">
+  <h1>💖 Tap here to Start 💖</h1>
 </div>
 
 <!-- Step 1 -->
 <div class="container fade" id="step1Container">
-  <div class="names">💖 From <span id="fromName">Shaik Imtiyaz</span>💖</div>
-  <h1>Is this 5c1? 🌸</h1>
+  <div class="names">💖 From <span id="fromName">Shaik</span> 💖</div>
+  <h1>Is this 5C1? 🌸</h1>
   <button class="yes-btn" onclick="step2Show()">Yes 😊</button>
   <button class="no-btn" id="noBtnStep1" onmouseover="moveButton(this)">No 🙈</button>
 </div>
 
 <!-- Step 2 -->
 <div class="container fade" id="step2Container">
-  <div class="names">💖 From <span id="fromName2">Shaik Imtiyaz</span> to <span id="toName">5c1🦋</span>💖</div>
+  <div class="names">💖 From <span id="fromName2">A stranger who feels you’re something special ❤</span> to <span id="toName">5C1🦋</span> 💖</div>
   <h1>Will You Be My Friend?</h1>
   <p>Because life is better with a friend like you 🌸</p>
-  <button class="yes-btn" onclick="sayYes()">Yes 😊</button>
-  <button class="no-btn" id="noBtn" onmouseover="moveButton(this)">No 🙈</button>
-  <div id="response"></div>
+  <button class="yes-btn" onclick="showSmileMessageStep()">Yes 😊</button>
+  <button class="no-btn" id="noBtn2" onmouseover="moveButton(this)">No 🙈</button>
 </div>
 
-<!-- Footer -->
-<div id="footer">Built with ❤️ by SHAIK IMTIYAZ</div>
+<!-- Step 3a — Smile Message -->
+<div class="container fade" id="smileMessageContainer">
+  <h1 id="smileMessageText"style="font-size:1.5em;">Yay! 🎉 5C1🦋, you just made Shaik's heart smile 💕😄</h1>
+  <button class="yes-btn" onclick="showPasswordStep()">Continue 💫</button>
+</div>
 
-<audio id="bgMusic" loop>
-  <source src="https://raw.githubusercontent.com/Imtiyaz1207/friend5c1/main/zara%20sa.mp3" type="audio/mpeg">
-</audio>
+<!-- Step 3b — Password input -->
+<div class="container fade" id="passwordContainer">
+  <p>Enter the full code to continue (hint: 23e51):</p>
+  <input type="text" id="secretCode" placeholder="Enter remaining code">
+  <div style="margin-top:10px; display:flex; justify-content:center; gap:10px;">
+    <button class="yes-btn" onclick="checkPassword()">Submit ✅</button>
+  </div>
+  <p id="passwordError">Incorrect code! Try again.</p>
+</div>
+
+<!-- Step 3c — Instagram Reel -->
+<div class="container fade" id="smileContainer">
+ <h1 style="font-size:1.0em; position:absolute; top:250px; right:20px;" id="smileMessage">Here's the reel—it will make you smile! 😄</h1>
+  <div id="smileVideoContainer" style="display:none; margin-top:15px;">
+    <blockquote class="instagram-media"
+      data-instgrm-permalink="https://www.instagram.com/reel/DPo9-tGiIhP/?igsh=MWR0djMyYzQ5dG9pbQ=="
+      data-instgrm-version="14"
+      style="background:#FFF; border:0; margin:1000px auto; max-width:540px; min-width:326px; width:99%;"></blockquote>
+  </div>
+
+<div id="footer">Built with ❤️ by Shaik07</div>
 
 <script>
-const fromName = "Shaik Imtiyaz";
-const toName = "5c1🦋";
+// ===== Logging helper =====
+function logAction(eventName) {
+  fetch("/log_action", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ event: eventName })
+  }).catch(err => console.log("Log error:", err));
+}
 
-document.getElementById("fromName").textContent = fromName;
-document.getElementById("fromName2").textContent = fromName;
-document.getElementById("toName").textContent = toName;
-
-const music = document.getElementById("bgMusic");
+// ===== 🔐 Page Password Check =====
+const overlay = document.getElementById("pagePasswordOverlay");
 const startScreen = document.getElementById("startScreen");
-const step1 = document.getElementById("step1Container");
-const step2 = document.getElementById("step2Container");
-const response = document.getElementById("response");
-const footer = document.getElementById("footer");
 
-// Floating hearts
-function createHearts(){
-    const heart = document.createElement("div");
-    heart.classList.add("heart");
-    heart.textContent="💖";
-    heart.style.left = Math.random()*100 + "vw";
-    heart.style.fontSize = Math.random()*20 +15 + "px";
-    document.body.appendChild(heart);
-    setTimeout(()=>heart.remove(),6000);
-}
-setInterval(createHearts,400);
+function verifyPagePassword(){
+  const correct = "muskan fatima";
+  const input = document.getElementById("pagePasswordInput").value.trim();
 
-// Log tap
-function logTap(action){
-    fetch('/log',{
-        method:'POST',
-        headers:{'Content-Type':'application/json'},
-        body: JSON.stringify({action: action})
-    });
+  // 🟢 Add this line
+  logAction("overlay_password_attempt:" + input);
+
+  if(input === correct){
+    overlay.classList.add("fadeOut");
+    setTimeout(()=>{ overlay.style.display = "none"; startScreen.style.display = "flex"; }, 800);
+    logAction("overlay_password_correct");
+  } else {
+    document.getElementById("pagePasswordError").style.display = "block";
+    logAction("overlay_password_incorrect");
+  }
 }
 
-// Page load log
-window.addEventListener('load', () => logTap('page_load'));
 
-// Start experience → Step 1
-function startExperience(){
-    startScreen.style.display="none";
-    step1.style.display="flex";
-    setTimeout(()=>step1.classList.add('show'), 50); // fade in
-    music.play().catch(()=>{});
-    logTap('tap');
-    document.body.removeEventListener('click', startExperience);
-}
-document.body.addEventListener('click', startExperience);
+// ===== Main Friendship Flow =====
+const audio = document.getElementById("bgMusic");
+audio.preload = "auto";
+audio.loop = true;
 
-// Step1 → Step2
-function step2Show(){
-    logTap('step1_yes');
-    step1.classList.remove('show');
-    setTimeout(()=>{
-        step1.style.display="none";
-        step2.style.display="flex";
-        setTimeout(()=>{
-            step2.classList.add('show'); // fade in step2
-            footer.classList.add('show'); // show footer
-        }, 50);
-    }, 600);
+startScreen.addEventListener("click", () => {
+  startScreen.style.display = "none";
+  showStep("step1Container");
+  audio.currentTime = 0;
+  audio.muted = false;
+  const playPromise = audio.play();
+  if(playPromise) playPromise.catch(()=>console.log("Audio blocked"));
+  document.getElementById("footer").classList.add("show");
+  logAction("start_screen_click");
+});
+
+function showStep(stepId){
+  document.querySelectorAll(".container").forEach(c=>c.style.display="none");
+  const step = document.getElementById(stepId);
+  step.style.display="flex";
+  setTimeout(()=>step.classList.add("show"),50);
 }
 
-// No button runaway
+function step2Show(){ showStep("step2Container"); logAction("step1_yes_click"); }
+function showSmileMessageStep(){ showStep("smileMessageContainer"); document.getElementById("footer").classList.add("show"); logAction("step2_yes_click"); }
+function showPasswordStep(){ showStep("passwordContainer"); logAction("smile_message_continue"); }
+
+function checkPassword(){
+  const userInput = document.getElementById("secretCode").value.trim();
+  const correctCode = "23e51a05c1";
+  logAction("password_attempt:" + userInput);
+  if(userInput === correctCode){
+    logAction("password_correct");
+    document.getElementById("passwordContainer").style.display="none";
+    showStep("smileContainer");
+    document.getElementById("smileVideoContainer").style.display="block";
+    audio.pause(); audio.currentTime=0; logAction("music_stop");
+    if(window.instgrm) window.instgrm.Embeds.process();
+  }else{
+    document.getElementById("passwordError").style.display="block";
+    logAction("password_incorrect");
+  }
+}
+
 function moveButton(btn){
-    logTap('no');
-    btn.style.position="absolute";
-    btn.style.top = Math.random()*80 + "%";
-    btn.style.left = Math.random()*80 + "%";
+  const x=Math.random()*(window.innerWidth-btn.offsetWidth);
+  const y=Math.random()*(window.innerHeight-btn.offsetHeight);
+  btn.style.position="absolute"; btn.style.left=x+"px"; btn.style.top=y+"px";
+  logAction("no_button_hover");
 }
 
-// Say Yes → just show response
-function sayYes(){
-    logTap('yes');
-    response.style.display = 'block';
-    response.classList.add('show');
-    response.innerHTML = `Yay! 🎉 ${toName}, you just made ${fromName}'s heart smile 💕`;
-}
+setInterval(()=>{
+  const heart=document.createElement("div");
+  heart.className="heart"; 
+  heart.style.left=Math.random()*100+"vw"; 
+  heart.style.fontSize=Math.random()*20+10+"px"; 
+  heart.innerText="💖";
+  document.body.appendChild(heart);
+  setTimeout(()=>heart.remove(),6000);
+},500);
 </script>
+<script async src="//www.instagram.com/embed.js"></script>
 </body>
+</html>
