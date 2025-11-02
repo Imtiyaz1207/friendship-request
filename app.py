@@ -4,18 +4,15 @@ import os
 import requests
 from dotenv import load_dotenv
 import csv
-import threading
-import time
 
-app = Flask(__name__)
+app = Flask(_name_)
 
-# Load environment variables (Google Script URL + RENDER URL)
+# Load environment variables (Google Script URL)
 load_dotenv()
 GOOGLE_SCRIPT_URL = os.getenv("GOOGLE_SCRIPT_URL")
-RENDER_URL = os.getenv("RENDER_URL")  # your Render app URL (https://your-app.onrender.com)
 
 # Absolute path for CSV log
-LOG_FILE = os.path.join(os.path.dirname(__file__), "logs.csv")
+LOG_FILE = os.path.join(os.path.dirname(_file_), "logs.csv")
 
 # Create CSV file if not exists
 if not os.path.exists(LOG_FILE):
@@ -48,29 +45,12 @@ def log_event(event, ip):
     except Exception as e:
         print("Google Sheet log failed:", e)
 
-
-# -----------------------
-# 🕒 Auto Keep-Alive Thread
-# -----------------------
-def keep_alive():
-    """Ping Render URL every 10 minutes to prevent sleeping."""
-    while True:
-        try:
-            if RENDER_URL:
-                response = requests.get(RENDER_URL)
-                print(f"[Keep-Alive] Pinged {RENDER_URL} | Status: {response.status_code}")
-        except Exception as e:
-            print("[Keep-Alive] Failed to ping:", e)
-        time.sleep(600)  # 10 minutes
-
-
 # Homepage
 @app.route("/")
 def index():
     ip = request.remote_addr
     log_event("page_visit", ip)
     return render_template("index.html")
-
 
 # Log user actions
 @app.route("/log_action", methods=["POST"])
@@ -81,10 +61,5 @@ def log_action():
     log_event(event, ip)
     return jsonify({"status": "ok"})
 
-
-if __name__ == "__main__":
-    # Start keep-alive thread in background
-    threading.Thread(target=keep_alive, daemon=True).start()
-
-    # Run Flask app
+if _name_ == "_main_":
     app.run(debug=True)
