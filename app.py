@@ -1,67 +1,90 @@
-from flask import Flask, render_template, request
-import csv
+from flask import Flask, render_template, request, jsonify
 from datetime import datetime
 import os
-import requests  # for sending POST to Google Sheets
+import requests
 from dotenv import load_dotenv
+import csv
+import threading
+import time
 
-# -------------------------------
-# Load environment variables from .env
-# -------------------------------
-load_dotenv()  # Reads variables from .env
-GOOGLE_SCRIPT_URL = os.getenv("GOOGLE_SCRIPT_URL")
-
-if not GOOGLE_SCRIPT_URL:
-    raise ValueError("❌ GOOGLE_SCRIPT_URL not found in .env")
-
-# -------------------------------
-# Create Flask app
-# -------------------------------
 app = Flask(__name__)
 
-# -------------------------------
-# Local CSV log file
-# -------------------------------
-log_file = 'logs.csv'
-if not os.path.exists(log_file):
-    with open(log_file, 'w', newline='') as f:
-        writer = csv.writer(f)
-        writer.writerow(['Time', 'Action'])
+# Load environment variables (Google Script URL + RENDER URL)
+load_dotenv()
+GOOGLE_SCRIPT_URL = os.getenv("GOOGLE_SCRIPT_URL")
+RENDER_URL = os.getenv("RENDER_URL")  # your Render app URL (https://your-app.onrender.com)
 
-# -------------------------------
-# Home page
-# -------------------------------
-@app.route('/')
-def home():
-    return render_template('index.html')
+# Absolute path for CSV log
+LOG_FILE = os.path.join(os.path.dirname(__file__), "logs.csv")
 
-# -------------------------------
-# Log endpoint
-# -------------------------------
-@app.route('/log', methods=['POST'])
-def log_tap():
-    data = request.json or {}
-    action = data.get('action', 'tap')
+# Create CSV file if not exists
+if not os.path.exists(LOG_FILE):
+    with open(LOG_FILE, "w", newline="", encoding="utf-8") as file:
+        writer = csv.writer(file)
+        writer.writerow(["timestamp", "event", "ip_address"])
 
-    # Log locally
-    with open(log_file, 'a', newline='') as f:
-        writer = csv.writer(f)
-        writer.writerow([datetime.now().isoformat(), action])
+# Log event function (CSV + Google Sheet)
+def log_event(event, ip):
+    time_now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")  # Full timestamp
 
-    # Log to Google Sheet
+    # Write to local CSV
     try:
-        response = requests.post(GOOGLE_SCRIPT_URL, json={'action': action})
-        print("Google Script response:", response.status_code, response.text)
-        if response.status_code != 200:
-            print("Error sending to Google Sheet:", response.text)
+        with open(LOG_FILE, "a", newline="", encoding="utf-8") as file:
+            writer = csv.writer(file)
+            writer.writerow([time_now, event, ip])
+        print(f"Logged to CSV: {time_now} | {event} | {ip}")
     except Exception as e:
-        print(f"Exception sending to Google Sheet: {e}")
+        print("CSV log failed:", e)
 
-    return {'status': 'logged'}
+    # Send to Google Sheet
+    try:
+        if GOOGLE_SCRIPT_URL:
+            response = requests.post(GOOGLE_SCRIPT_URL, json={
+                "time": time_now,
+                "event": event,
+                "ip_address": ip
+            })
+            print("Google Sheet response:", response.text)
+    except Exception as e:
+        print("Google Sheet log failed:", e)
 
-# -------------------------------
-# Run Flask app
-# -------------------------------
-if __name__ == '__main__':
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host='0.0.0.0', port=port, debug=True)
+
+# -----------------------
+# 🕒 Auto Keep-Alive Thread
+# -----------------------
+def keep_alive():
+    """Ping Render URL every 10 minutes to prevent sleeping."""
+    while True:
+        try:
+            if RENDER_URL:
+                response = requests.get(RENDER_URL)
+                print(f"[Keep-Alive] Pinged {RENDER_URL} | Status: {response.status_code}")
+        except Exception as e:
+            print("[Keep-Alive] Failed to ping:", e)
+        time.sleep(600)  # 10 minutes
+
+
+# Homepage
+@app.route("/")
+def index():
+    ip = request.remote_addr
+    log_event("page_visit", ip)
+    return render_template("index.html")
+
+
+# Log user actions
+@app.route("/log_action", methods=["POST"])
+def log_action():
+    data = request.get_json()
+    event = data.get("event", "unknown")
+    ip = request.remote_addr
+    log_event(event, ip)
+    return jsonify({"status": "ok"})
+
+
+if __name__ == "__main__":
+    # Start keep-alive thread in background
+    threading.Thread(target=keep_alive, daemon=True).start()
+
+    # Run Flask app
+    app.run(debug=True)
