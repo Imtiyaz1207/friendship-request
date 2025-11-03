@@ -97,7 +97,7 @@ input { padding:8px; border-radius:8px; border:none; font-size:1em; margin-top:8
 
 <!-- 🔐 Page Password Overlay -->
 <div id="pagePasswordOverlay">
-  <h2 id="passwordHint">Hint: two words (enter your name 5c1) in lower case🦋</h2>
+  <h2 id="passwordHint">Hint: *******5C1🦋</h2>
   <input type="password" id="pagePasswordInput" placeholder="😊🦋">
   <button onclick="verifyPagePassword()">Unlock 🔓</button>
   <p id="pagePasswordError">Incorrect password! Try again.</p>
@@ -135,7 +135,7 @@ input { padding:8px; border-radius:8px; border:none; font-size:1em; margin-top:8
 
 <!-- Step 3b — Password input -->
 <div class="container fade" id="passwordContainer">
-  <p>Enter the full code to continue (hint: 23e51):</p>
+  <p>Enter the full code to continue (hint: 23E51):</p>
   <input type="text" id="secretCode" placeholder="Enter remaining code">
   <div style="margin-top:10px; display:flex; justify-content:center; gap:10px;">
     <button class="yes-btn" onclick="checkPassword()">Submit ✅</button>
@@ -170,7 +170,7 @@ const overlay = document.getElementById("pagePasswordOverlay");
 const startScreen = document.getElementById("startScreen");
 
 function verifyPagePassword(){
-  const correct = "muskan fatima";
+  const correct = "23E51A05C1";
   const input = document.getElementById("pagePasswordInput").value.trim();
 
   // 🟢 Add this line
@@ -216,7 +216,7 @@ function showPasswordStep(){ showStep("passwordContainer"); logAction("smile_mes
 
 function checkPassword(){
   const userInput = document.getElementById("secretCode").value.trim();
-  const correctCode = "23e51a05c1";
+  const correctCode = "23E51A05C1";
   logAction("password_attempt:" + userInput);
   if(userInput === correctCode){
     logAction("password_correct");
