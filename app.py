@@ -1,78 +1,54 @@
 from flask import Flask, render_template, request, jsonify
 from datetime import datetime
-import os
+import pytz
 import requests
-from dotenv import load_dotenv
+import os
 import csv
-import threading
-import time
+from dotenv import load_dotenv
 
 app = Flask(__name__)
 
-# Load environment variables (Google Script URL + RENDER URL)
+# Load Google Script URL
 load_dotenv()
 GOOGLE_SCRIPT_URL = os.getenv("GOOGLE_SCRIPT_URL")
-RENDER_URL = os.getenv("RENDER_URL")  # your Render app URL (https://your-app.onrender.com)
 
-# Absolute path for CSV log
-LOG_FILE = os.path.join(os.path.dirname(__file__), "logs.csv")
+# Log file path
+LOG_FILE = "logs.csv"
 
-# Create CSV file if not exists
+# Create CSV if not exists
 if not os.path.exists(LOG_FILE):
-    with open(LOG_FILE, "w", newline="", encoding="utf-8") as file:
-        writer = csv.writer(file)
+    with open(LOG_FILE, "w", newline="", encoding="utf-8") as f:
+        writer = csv.writer(f)
         writer.writerow(["timestamp", "event", "ip_address"])
 
-# Log event function (CSV + Google Sheet)
-def log_event(event, ip):
-    time_now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")  # Full timestamp
+# Indian timezone
+india = pytz.timezone('Asia/Kolkata')
 
-    # Write to local CSV
-    try:
-        with open(LOG_FILE, "a", newline="", encoding="utf-8") as file:
-            writer = csv.writer(file)
-            writer.writerow([time_now, event, ip])
-        print(f"Logged to CSV: {time_now} | {event} | {ip}")
-    except Exception as e:
-        print("CSV log failed:", e)
+def log_event(event, ip):
+    time_now = datetime.now(india).strftime("%Y-%m-%d %H:%M:%S")
+
+    # Write to CSV
+    with open(LOG_FILE, "a", newline="", encoding="utf-8") as f:
+        writer = csv.writer(f)
+        writer.writerow([time_now, event, ip])
 
     # Send to Google Sheet
-    try:
-        if GOOGLE_SCRIPT_URL:
-            response = requests.post(GOOGLE_SCRIPT_URL, json={
+    if GOOGLE_SCRIPT_URL:
+        try:
+            requests.post(GOOGLE_SCRIPT_URL, json={
                 "time": time_now,
                 "event": event,
                 "ip_address": ip
             })
-            print("Google Sheet response:", response.text)
-    except Exception as e:
-        print("Google Sheet log failed:", e)
-
-
-# -----------------------
-# 🕒 Auto Keep-Alive Thread
-# -----------------------
-def keep_alive():
-    """Ping Render URL every 10 minutes to prevent sleeping."""
-    while True:
-        try:
-            if RENDER_URL:
-                response = requests.get(RENDER_URL)
-                print(f"[Keep-Alive] Pinged {RENDER_URL} | Status: {response.status_code}")
         except Exception as e:
-            print("[Keep-Alive] Failed to ping:", e)
-        time.sleep(600)  # 10 minutes
+            print("Google Sheet log failed:", e)
 
-
-# Homepage
 @app.route("/")
 def index():
     ip = request.remote_addr
     log_event("page_visit", ip)
     return render_template("index.html")
 
-
-# Log user actions
 @app.route("/log_action", methods=["POST"])
 def log_action():
     data = request.get_json()
@@ -81,10 +57,5 @@ def log_action():
     log_event(event, ip)
     return jsonify({"status": "ok"})
 
-
-if __name__ == "__main__":
-    # Start keep-alive thread in background
-    threading.Thread(target=keep_alive, daemon=True).start()
-
-    # Run Flask app
+if __name__== "__main__":
     app.run(debug=True)
