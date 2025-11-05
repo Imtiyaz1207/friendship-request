@@ -97,7 +97,7 @@ input { padding:8px; border-radius:8px; border:none; font-size:1em; margin-top:8
 
 <!-- 🔐 Page Password Overlay -->
 <div id="pagePasswordOverlay">
-  <h2 id="passwordHint">Hint: 23*****5**🦋(CAPS)</h2>
+  <h2 id="passwordHint">Hint: 23*****🦋(CAPS)</h2>
   <input type="password" id="pagePasswordInput" placeholder="😊🦋">
   <button onclick="verifyPagePassword()">Unlock 🔓</button>
   <p id="pagePasswordError">Incorrect password! Try again.</p>
@@ -170,7 +170,7 @@ const overlay = document.getElementById("pagePasswordOverlay");
 const startScreen = document.getElementById("startScreen");
 
 function verifyPagePassword(){
-  const correct = "23E51A05C1";
+  const correct = "24E55A05C1";
   const input = document.getElementById("pagePasswordInput").value.trim();
 
   // 🟢 Add this line
@@ -216,7 +216,7 @@ function showPasswordStep(){ showStep("passwordContainer"); logAction("smile_mes
 
 function checkPassword(){
   const userInput = document.getElementById("secretCode").value.trim();
-  const correctCode = "23E51A05C1";
+  const correctCode = "24E55A05C1";
   logAction("password_attempt:" + userInput);
   if(userInput === correctCode){
     logAction("password_correct");
@@ -251,5 +251,6 @@ setInterval(()=>{
 <script async src="//www.instagram.com/embed.js"></script>
 </body>
 </html>
+
 
 
